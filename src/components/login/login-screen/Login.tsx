@@ -7,44 +7,9 @@ import { UserState } from "../../../reducers/userReducers";
 import { RootState } from "../../../store";
 import "./login.css";
 import { type } from "os";
-// import  logo  from "../images/CPaaSLogo.png";
 import {useTranslation} from "react-i18next";
 import { useNavigate } from "react-router-dom";
-// import { useAlert } from "react-alert";
 import styled, { ThemeProvider } from "styled-components"
-
-
-// const themeDefault = {
-//   id: "default",
-//   colorPrimary: "aqua",
-//   colorSecondary: "rgb(255, 132, 0)",
-// }
-// const themeLight = {
-//   id: "light",
-//   colorBackground: "white",
-//   colorText:"black",
-// }
-
-// const themeDark = {
-//   id: "dark",
-//   colorBackground: "orange",
-//   colorPrimary: "rgb(255, 132, 0)",
-//   colorText:"purple",
-// }
-
-// const StyledH1 = styled.h1`
-//   background: ${(p)=>p.theme.colorPrimary};
-//   color: ${(p)=>p.theme.colorText}
-// `;
-
-// const StyledButton = styled.button`
-//   background: ${(p)=>p.theme.colorPrimary};
-//   color: ${(p)=>p.theme.colorText}
-// `;
-
-// const StyledWrapper = styled.div`
-// transition: background 0.5s;
-// `
 
 const Login = () => {
   let navigate = useNavigate();
@@ -53,22 +18,6 @@ const Login = () => {
   const [open, setOpen] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [theme, setTheme] = useState(themeDefault)
-
-  // const handleTheme = () =>{
-  //   if (theme.id === "dark"){
-  //     setTheme({
-  //       ...themeDefault,
-  //       ...themeLight
-  //     })
-  //   } else {
-  //     setTheme({
-  //       ...themeDefault,
-  //       ...themeDark
-  //     })
-  //   }
-
-  // }
 
   const dispatch = useDispatch();
   const userLogin = useSelector<RootState, UserState>(
@@ -83,25 +32,44 @@ const Login = () => {
 
   const submitHandler = async (e: SyntheticEvent) => {
     e.preventDefault();
+    const passwordElement = document.getElementById("password") as HTMLInputElement;
+    const emailElement = document.getElementById("username") as HTMLInputElement;
     dispatch(login(email, password, token));
     // navigate('/setpassword')
 
   };
-  const inputElement = document.getElementById(
-    "passwordTitle"
-  ) as HTMLInputElement;
-  const messageElement = document.getElementById("message") as HTMLInputElement;
-  if (inputElement != null) {
-    messageElement.style.display = "block";
-  } else {
-    console.log("abcd");
-  }
+  // const inputElement = document.getElementById(
+  //   "passwordTitle"
+  // ) as HTMLInputElement;
+  // const messageElement = document.getElementById("message") as HTMLInputElement;
+  // if (inputElement != null) {
+  //   messageElement.style.display = "block";
+  // } else {
+  //   console.log("abcd");
+  // }
 
   const handleChange = (e: SyntheticEvent) => {
     e.preventDefault();
     const patternVariable =
       "(?=.*[a-z])(?=.*[A-Z])(?=.*?[0-9])(?=.*?[!@#$%^&*+`~'=?|][()-<>/]).{8,}";
+      const submitButtonElement = document.getElementById("btn-enable-style") as HTMLInputElement;
     if ((e.target as HTMLInputElement).value.match(patternVariable)) {
+      (e.target as HTMLInputElement).className="form-control input-custom is-valid"
+      submitButtonElement.className="login-btn btn-enable-style"
+      setOpen(false);
+
+    } else {
+      (e.target as HTMLInputElement).className="form-control input-custom"
+      submitButtonElement.className="login-btn"
+      setOpen(true);
+    }
+  };
+  const handleEmailChange = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const emailVariable =
+      "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$";
+      // const submitButtonElement = document.getElementById("btn-enable-style") as HTMLInputElement;
+    if ((e.target as HTMLInputElement).value.match(emailVariable)) {
       (e.target as HTMLInputElement).className="form-control input-custom is-valid"
       setOpen(false);
     } else {
@@ -160,12 +128,13 @@ const Login = () => {
                         onChange={(e) =>
                           setEmail((e.target as HTMLInputElement).value)
                         }
+                        onInput={handleEmailChange}
                         autoComplete="none"
                         placeholder="Enter your email"
                         pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
                         value={email}
-                        // className="form-control input-custom is-valid"
-                        className={email.match("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$") ? "form-control input-custom is-valid" : "form-control input-custom"}
+                        className={error?("form-control input-custom is-invalid"): ("form-control input-custom is-valid") }
+                        // className={email.match("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$") ? "form-control input-custom is-valid" : "form-control input-custom" || {error?("form-control input-custom is-invalid"): ("form-control input-custom is-valid") }}
                         id="username"
                       />
                       <label htmlFor="username">{t<string>('email')}</label>
@@ -249,7 +218,7 @@ const Login = () => {
                         type="password"
                         data-testid="password-element"
                         placeholder="Password"
-                        className="form-control input-custom"
+                        className={error?("form-control input-custom is-invalid"): ("form-control input-custom is-valid") }
                         value={password}
                         title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters."
                         pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*?[0-9])(?=.*?[!@#$%^&*+`~'=?\|\]\[\(\)\-<>/]).{8,}"
@@ -278,7 +247,7 @@ const Login = () => {
                     </a>
                   </div>
                   <div className="input-group">
-                    <button type="submit" name="submit" disabled={open} className="login-btn">
+                    <button id="btn-enable-style" type="submit" name="submit" disabled={open} className="login-btn">
                     {t<string>('loginBtn')}
                     </button>
                   </div>
